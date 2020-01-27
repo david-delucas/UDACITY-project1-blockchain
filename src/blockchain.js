@@ -119,7 +119,15 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            
+            let timeMsg = parseInt(message.split(':')[1]);
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+            if (Math.floor((currentTime - timeMsg)/60.0) < 5 && currentTime > timeMsg) {
+                console.log("sdsfsdsdf"); 
+            } else {
+                console.log("sdsfsdsdf2");
+            }
+            let validateMsg=bitcoinMessage.verify(message, address, signature);
+            resolve("XXXX");
         });
     }
 
