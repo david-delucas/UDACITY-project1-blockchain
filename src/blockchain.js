@@ -65,8 +65,23 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
            let newBlock = block;
-           
+           let newHeight = -1;
+           self.getChainHeight().then((result) => {
+                            console.log(`Height: ${result}`);
+                            newHeight=result;
+                        }).catch((error) => {console.log(error)});
+           newBlock.time = new Date().getTime().toString().slice(0,-3);  
+           newBlock.height = newHeight + 1;
+           if(newHeight >= 0){
+                let previousBlock = self.chain[self.height];
+                newBlock.previousBlockHash = previousBlock.hash;
+            }                      
+            newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
+            self.chain.push(newBlock);
+            self.height = self.chain.length -1;
+            resolve(newBlock);
         });
+
     }
 
     /**
@@ -78,8 +93,9 @@ class Blockchain {
      * @param {*} address 
      */
     requestMessageOwnershipVerification(address) {
-        return new Promise((resolve) => {
-            
+        return new Promise((resolve, reject) => {
+            let msg=address+`:${new Date().getTime().toString().slice(0,-3)}:starRegistry`;
+            resolve(msg);
         });
     }
 
