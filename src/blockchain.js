@@ -121,13 +121,28 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let timeMsg = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-            if (Math.floor((currentTime - timeMsg)/60.0) < 5 && currentTime > timeMsg) {
-                console.log("sdsfsdsdf"); 
+            if (Math.floor((currentTime - timeMsg)) < 5*60*1000 && currentTime > timeMsg) {
+                try {
+                    let validMsg=bitcoinMessage.verify(message, address, signature);
+                    console.log(`bitcoinMessage return code: ${validMsg}`);
+                    if(validMsg) {
+                        let auxlock = new BlockClass.Block({address:address,star:star})
+                        let newBlock = auxlock;
+                        self._addBlock(auxBlock).then((result) => {
+                            console.log(`Height: ${result}`);
+                            newBlock=result;
+                        }).catch((error) => {console.log(error)});
+                        resolve(newBlock);
+                    } else {
+                        reject("Signature is not valid");
+                    }
+                }catch (error) {
+                    reject("Error while validating message");
+                }
             } else {
-                console.log("sdsfsdsdf2");
+                //console.log("Reject");
+                reject(`Time expired: there is a 5 minutes time limit to complete submission`);
             }
-            let validateMsg=bitcoinMessage.verify(message, address, signature);
-            resolve("XXXX");
         });
     }
 
