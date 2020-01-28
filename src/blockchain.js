@@ -240,8 +240,29 @@ class Blockchain {
     validateChain() {
         let self = this;
         let errorLog = [];
+        let blocks = [];
         return new Promise(async (resolve, reject) => {
+            blocks = self.chain.filter(function (b) {
+                console.log(JSON.stringify(b).toString() );
+                let validate=b.validate();
+                console.log(validate);
+                if (!validate) {
+                    return true;
+                } else {
+                    return null;
+
+                }
+            });
+            if(blocks) {
+                console.log(JSON.stringify(blocks).toString() );
+                resolve(blocks);
+
+            } else {
+                reject([]);
+
+            }
             
+
         });
     }
 
