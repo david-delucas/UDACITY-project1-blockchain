@@ -164,7 +164,16 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           
+            let block = self.chain.filter(function (b) {
+                            return b.hash === hash;
+                        });
+            if(block) {
+                resolve(block);
+
+            } else {
+                reject("block not found!");
+
+            }
         });
     }
 
@@ -194,8 +203,31 @@ class Blockchain {
     getStarsByWalletAddress (address) {
         let self = this;
         let stars = [];
+        let blocks = [];
         return new Promise((resolve, reject) => {
-            
+            console.log(`getStarsByWalletAddress: ${address}`);            
+            blocks = self.chain.filter(function (b) {
+                console.log(JSON.stringify(b).toString() );
+                let bdata=b.getBData();
+                console.log(bdata);
+                if (bdata) {
+                    return bdata.address === address;
+                } else {
+                    return null;
+
+                }
+            });
+            if(blocks) {
+                console.log(JSON.stringify(blocks).toString() );
+                resolve(blocks.map(a => a.getBData().star));
+
+            } else {
+                reject([]);
+
+            }
+
+
+
         });
     }
 
