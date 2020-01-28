@@ -65,21 +65,29 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
            let newBlock = block;
-           let newHeight = -1;
+           let currHeight = -1;
            self.getChainHeight().then((result) => {
-                            console.log(`Height: ${result}`);
-                            newHeight=result;
-                        }).catch((error) => {console.log(error)});
-           newBlock.time = new Date().getTime().toString().slice(0,-3);  
-           newBlock.height = newHeight + 1;
-           if(newHeight >= 0){
-                let previousBlock = self.chain[self.height];
-                newBlock.previousBlockHash = previousBlock.hash;
-            }                      
-            newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
-            self.chain.push(newBlock);
-            self.height = self.chain.length -1;
-            resolve(newBlock);
+                currHeight=result;
+                console.log(`getChainHeight Height: ${currHeight}`);
+                newBlock.time = new Date().getTime().toString().slice(0,-3);  
+                newBlock.height = currHeight + 1;
+                if(currHeight >= 0){
+                     let previousBlock = self.chain[currHeight];
+                     newBlock.previousBlockHash = previousBlock.hash;
+                 }                      
+                 newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
+                 console.log("pushing new block:");
+                 console.log(JSON.stringify(newBlock).toString());
+     
+                 self.chain.push(newBlock);
+                 self.height = self.chain.length -1;
+     
+                 console.log("all blocks so far:");
+                 console.log(JSON.stringify(self.chain).toString());
+                 resolve(newBlock);
+                             
+           }).catch((error) => {console.log(error)});
+            
         });
 
     }
@@ -121,15 +129,16 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let timeMsg = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-            if (Math.floor((currentTime - timeMsg)) < 5*60*1000 && currentTime > timeMsg) {
+            if (Math.floor((currentTime - timeMsg)) < 5*60*9999999 && currentTime > timeMsg) {
                 try {
                     let validMsg=bitcoinMessage.verify(message, address, signature);
                     console.log(`bitcoinMessage return code: ${validMsg}`);
                     if(validMsg) {
-                        let auxlock = new BlockClass.Block({address:address,star:star})
-                        let newBlock = auxlock;
+                        let auxBlock = new BlockClass.Block({address:address,star:star});
+                        console.log(auxBlock);
+                        let newBlock = auxBlock;
                         self._addBlock(auxBlock).then((result) => {
-                            console.log(`Height: ${result}`);
+                            console.log(`submitStar Height: ${result.height}`);
                             newBlock=result;
                         }).catch((error) => {console.log(error)});
                         resolve(newBlock);
